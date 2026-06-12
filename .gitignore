@@ -1,0 +1,25 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Data directories and large source datasets (Crucial to prevent uploading 200k+ row raw files)
+*.csv
+cleaned_merged_trading_data.csv
+historical_data.csv
+fear_greed_index.csv
+
+# Environments and Virtual Machine dependencies
+.venv/
+venv/
+ENV/
+env/
+.abc/
+
+# IDE files
+.vscode/
+.idea/
+
+# OS metadata files
+.DS_Store
+Thumbs.db

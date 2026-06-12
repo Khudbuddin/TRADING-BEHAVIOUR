@@ -1,77 +1,212 @@
 # 📊 Hyperliquid Trader Behavior & Bitcoin Market Sentiment Analysis
 
-An end-to-end data science study analyzing how macro psychological market regimes dictate decentralized exchange (DEX) trader risk parameters, efficiency, and net profitability capture on Hyperliquid.
+## Overview
+
+This project analyzes the relationship between Bitcoin market sentiment and trader behavior on Hyperliquid. By combining historical trading activity with the Bitcoin Fear & Greed Index, the study investigates how different market sentiment regimes influence trading performance, risk-taking behavior, position sizing, and profitability.
+
+The objective is to uncover actionable insights that can support the development of more effective trading and risk-management strategies.
 
 ---
 
-## 📁 Repository Structure
+## Project Objectives
+
+* Analyze trader performance across different market sentiment states.
+* Measure the impact of Fear and Greed on profitability and execution efficiency.
+* Identify behavioral patterns related to position sizing and risk exposure.
+* Generate data-driven recommendations for algorithmic trading strategies.
+
+---
+
+## Repository Structure
+
 ```text
 ├── data/
-│   ├── historical_data.csv                 # Raw execution log data (Excl. from Git)
-│   ├── fear_greed_index.csv                # Raw daily sentiment log (Excl. from Git)
-│   └── cleaned_merged_trading_data.csv    # Consolidated master dataset (Excl. from Git)
+│   ├── historical_data.csv
+│   ├── fear_greed_index.csv
+│   └── cleaned_merged_trading_data.csv
+
 ├── plots/
-│   ├── trader_capital_sizing_trap.png      # Chart: Average Position Sizing across Sentiment
-│   └── sentiment_profitability_analysis.png# Chart: Net PnL vs Execution Win Rate
-├── preprocessing.py                 # Data extraction, alignment, and cleaning pipeline
-├── analysis.py                      # Vectorized metrics and performance analytics engine
-├── visualizations.py                # Seaborn visualization script
-└── README.md                               # Comprehensive project report & documentation
+│   ├── trader_capital_sizing_trap.png
+│   └── sentiment_profitability_analysis.png
 
-### 1. Executive Summary
-An analysis of $211,218$ discrete trade execution logs spanning a 2-year window (May 2023 – May 2025) was cross-referenced against daily Bitcoin Fear & Greed Index data points. The objective was to determine whether macro psychological market states dictate decentralized exchange (DEX) trader risk parameters, efficiency, and overall capture of Net Realized Profit ($PnL$).
-
-The data reveals a stark, counter-intuitive behavioral paradox: while traders exhibit their highest execution accuracy ($89.17\%$ win rate) during macro Extreme Greed environments, they systematically over-allocate capital and take their highest risk exposure via large position sizes during periods of Fear, significantly deteriorating capital efficiency.
+├── preprocessing.py
+├── analysis.py
+├── visualizations.py
+├── requirements.txt
+└── README.md
+```
 
 ---
 
-### 2. Consolidated Performance Metric Matrix
-To normalize and analyze the execution patterns, raw granular transactional times (Timestamp IST) were unified into daily standard dates (YYYY-MM-DD) and inner-joined with daily sentiment brackets.
+## Dataset Description
 
-| Market Sentiment State | Total Executed Trades | Aggregate Volume (USD) | Average Position Size (USD) | Total Net Realized PnL (USD) | Execution Win Rate | Total Protocol Fees Paid (USD) |
-| :--- | :---: | :---: | :---: | :---: | :---: | :---: |
-| **Extreme Fear** | 21,400 | \$114,484,261.44 | \$5,349.73 | \$739,110.25 | $76.22\%$ | \$23,888.63 |
-| **Fear** | 61,837 | \$483,324,789.79 | \$7,816.11 | \$3,357,155.44 | $87.29\%$ | \$92,456.95 |
-| **Neutral** | 37,686 | \$180,242,063.08 | \$4,782.73 | \$1,292,920.68 | $82.39\%$ | \$39,374.27 |
-| **Greed** | 50,303 | \$288,582,494.72 | \$5,736.88 | \$2,150,129.27 | $76.89\%$ | \$63,098.69 |
-| **Extreme Greed** | 39,992 | \$124,465,164.57 | \$3,112.25 | \$2,715,171.31 | $89.17\%$ | \$27,030.67 |
+### 1. Bitcoin Fear & Greed Index
 
----
+Daily market sentiment classification categorized into:
 
-### 3. Core Analytical Discoveries & Hidden Patterns
+* Extreme Fear
+* Fear
+* Neutral
+* Greed
+* Extreme Greed
 
-#### 💡 Alpha Insight A: The Sizing Distortion Trap (Risk-Reversal Bias)
-The most significant operational pattern discovered centers around how traders scale position sizes relative to emotional environments. In standard **Fear** cycles, the average position size peaks drastically at \$7,816.11 per trade—resulting in a massive aggregate volume cluster of \$483.32 Million. Conversely, when the market transitions into **Extreme Greed**, traders dramatically scale down their risk profiles, lowering their average position size by over $60\%$ down to \$3,112.25.
+### 2. Hyperliquid Historical Trading Data
 
-<p align="center">
-  <img src="trader_capital_sizing_trap.png" alt="Traders Risk Exposure Profile" width="600"/>
-</p>
+Key fields include:
 
-*Psychological Inference:* Traders frequently suffer from over-confidence when catching down-trending prices ("buying the dip" aggressively), scaling up their positions prematurely during Fear. In contrast, they display clear profit-taking hesitation and exposure minimization during powerful macro uptrends (Extreme Greed).
-
-#### 💡 Alpha Insight B: The Extreme Greed Efficiency Miracle
-Conventional trading wisdom suggests that retail traders lose money by FOMO-ing during periods of high greed. However, the transactional data on Hyperliquid reveals that trades executed during **Extreme Greed** achieve a stellar $89.17\%$ win rate, generating \$2.71 Million in realized profits on a modest volume of \$124.46 Million.
-
-Conversely, when the market drops into **Extreme Fear**, execution accuracy breaks down completely, hitting a baseline floor of $76.22\%$ win rate. This highlights a severe breakdown in risk management or heavy cascade liquidation events during deep panic conditions.
-
-<p align="center">
-  <img src="sentiment_profitability_analysis.png" alt="Trading Profitability & Efficiency" width="600"/>
-</p>
+* Account
+* Symbol
+* Execution Price
+* Position Size
+* Side
+* Timestamp
+* Closed PnL
+* Leverage
+* Transaction Fees
 
 ---
 
-### 4. Data Science & Engineering Methodology
-To execute this analysis cleanly, an end-to-end Python preprocessing and analytics pipeline was deployed:
-1. **Datetime Mapping:** Standardized non-uniform Indian Standard Time string stamps (`%d-%m-%Y %H:%M`) within the historical transaction data into a stripped `datetime.date` index.
-2. **Data Integrity Filtration:** Missing dates or unparseable timestamps were handled via coerced transformations (`errors='coerce'`) to insulate the inner merge from dropping critical alpha features. 
-3. **Vectorized Metrics:** Created binary logical arrays (`is_win` / `is_loss`) to isolate execution efficiency dynamically from non-zero closing transaction rows.
-4. **Data Visualizations:** Built and exported dual-axis matplotlib/seaborn plots to evaluate the visual intersections of sentiment value fluctuations against underlying wallet metrics.
+## Tech Stack
+
+* Python
+* Pandas
+* NumPy
+* Matplotlib
+* Seaborn
 
 ---
 
-### 5. Algorithmic Recommendations for Smarter Trading Strategies
-Based on the empirical evidence extracted from the Hyperliquid records, Primetrade.ai can exploit these system inefficiencies to build robust trading models:
+## Data Processing Pipeline
 
-* **Implement Dynamic, Sentiment-Based Position Sizing:** Rather than letting human traders scale up size into down-trends, the automated system should force position sizes to scale *down* dynamically when the daily index reads "Fear" or "Extreme Fear" to preserve capital.
-* **Automate Trend-Continuation Momentum Modules:** Given the high efficiency ($89.17\%$ win rate) during Extreme Greed, algorithm configurations should optimize for short-horizon breakout and momentum tracking strategies. Momentum plays during high sentiment states capture high-probability continuation moves far better than mean-reversion attempts during heavy sell-offs.
-* **Adaptive Fee Optimization:** With over \$245k spent across the system in protocol trading fees, execution modules should deploy passive limit-order strategies (maker instead of taker executions) during high-volume Fear clusters to severely reduce transaction drag.
+### Step 1: Data Cleaning
+
+* Converted timestamps into standardized date format.
+* Handled invalid or missing date values using `errors='coerce'`.
+* Removed incomplete records where necessary.
+
+### Step 2: Dataset Integration
+
+* Aggregated trade records at the daily level.
+* Merged Hyperliquid trade data with Fear & Greed sentiment data using date-based joins.
+
+### Step 3: Feature Engineering
+
+Created analytical metrics such as:
+
+* Win/Loss Indicator
+* Daily Profitability
+* Average Position Size
+* Trading Volume
+* Protocol Fee Consumption
+
+### Step 4: Exploratory Data Analysis
+
+Analyzed:
+
+* Profitability by sentiment regime
+* Win rate by sentiment regime
+* Position sizing behavior
+* Trading volume distribution
+
+---
+
+# Executive Summary
+
+A total of **211,218 trade executions** spanning **May 2023 to May 2025** were analyzed and cross-referenced against daily Bitcoin Fear & Greed Index values.
+
+The analysis reveals a notable behavioral pattern:
+
+* Traders achieve their highest win rate during **Extreme Greed** conditions.
+* Traders deploy their largest average position sizes during **Fear** conditions.
+* Larger position sizes during Fear do not necessarily translate into superior capital efficiency.
+* Market sentiment appears strongly associated with both risk-taking behavior and trading performance.
+
+---
+
+# Performance Summary
+
+| Market Sentiment | Total Trades | Aggregate Volume (USD) | Avg Position Size (USD) | Net Realized PnL (USD) | Win Rate | Fees Paid (USD) |
+| ---------------- | ------------ | ---------------------- | ----------------------- | ---------------------- | -------- | --------------- |
+| Extreme Fear     | 21,400       | $114,484,261.44        | $5,349.73               | $739,110.25            | 76.22%   | $23,888.63      |
+| Fear             | 61,837       | $483,324,789.79        | $7,816.11               | $3,357,155.44          | 87.29%   | $92,456.95      |
+| Neutral          | 37,686       | $180,242,063.08        | $4,782.73               | $1,292,920.68          | 82.39%   | $39,374.27      |
+| Greed            | 50,303       | $288,582,494.72        | $5,736.88               | $2,150,129.27          | 76.89%   | $63,098.69      |
+| Extreme Greed    | 39,992       | $124,465,164.57        | $3,112.25               | $2,715,171.31          | 89.17%   | $27,030.67      |
+
+---
+
+# Key Insights
+
+## Insight 1: Position Sizing Peaks During Fear
+
+The highest average position size was observed during **Fear** periods at **$7,816.11**, accompanied by the largest aggregate trading volume.
+
+In contrast, traders significantly reduced position sizes during **Extreme Greed**, where the average position size fell to **$3,112.25**.
+
+This suggests that traders tend to increase risk exposure during fearful market conditions, potentially attempting to capitalize on anticipated market reversals.
+
+### Visualization
+
+![Position Size Analysis](plots/trader_capital_sizing_trap.png)
+
+---
+
+## Insight 2: Trading Efficiency Peaks During Extreme Greed
+
+Trades executed during **Extreme Greed** achieved the highest win rate of **89.17%**, generating approximately **$2.71 million** in realized profits.
+
+Meanwhile, **Extreme Fear** recorded the lowest win rate at **76.22%**.
+
+These findings suggest that bullish market environments may provide clearer directional trends and more favorable trading conditions.
+
+### Visualization
+
+![Profitability Analysis](plots/sentiment_profitability_analysis.png)
+
+---
+
+# Business Recommendations
+
+## 1. Dynamic Sentiment-Based Position Sizing
+
+Reduce position sizes during Fear and Extreme Fear conditions to limit downside exposure and improve capital preservation.
+
+## 2. Momentum-Oriented Strategy Deployment
+
+Given the strong performance observed during Extreme Greed periods, momentum-based trading strategies may outperform mean-reversion approaches in highly bullish environments.
+
+## 3. Trading Fee Optimization
+
+High-volume Fear periods generated the largest protocol fee expenditure. Implementing passive order execution mechanisms could reduce transaction costs and improve net profitability.
+
+---
+
+# Limitations
+
+While the analysis provides valuable insights, several limitations should be considered:
+
+* The study identifies correlations rather than causal relationships.
+* Daily sentiment values may not fully capture intraday market psychology.
+* Trader-level segmentation was not performed.
+* External macroeconomic and geopolitical events were not incorporated into the analysis.
+* Risk-adjusted performance metrics such as Sharpe Ratio were not evaluated.
+
+---
+
+# Future Improvements
+
+Potential extensions of this project include:
+
+* Trader segmentation analysis (Top vs Bottom Performers)
+* Correlation and statistical significance testing
+* Risk-adjusted return analysis
+* Machine learning models for sentiment-driven trade prediction
+* Time-series forecasting of trader profitability
+
+---
+
+# Conclusion
+
+The study demonstrates a clear relationship between Bitcoin market sentiment and trader behavior on Hyperliquid. Traders tend to assume larger positions during Fear periods while achieving their highest execution efficiency during Extreme Greed conditions.
+
+These findings highlight opportunities for sentiment-aware risk management, dynamic position sizing, and momentum-based strategy optimization in algorithmic trading systems.
